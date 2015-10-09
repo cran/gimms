@@ -1,8 +1,8 @@
 Package: gimms
 Type: Package
 Title: Download and Process GIMMS NDVI3g Data
-Version: 0.1
-Date: 2015-10-05
+Version: 0.1.1
+Date: 2015-10-09
 Author: Florian Detsch
 Maintainer: Florian Detsch <admin@environmentalinformatics-marburg.de>
 Description: 
@@ -16,6 +16,6 @@ Depends: raster, methods
 License: GPL (>= 3) | file LICENSE
 LazyData: TRUE
 NeedsCompilation: no
-Packaged: 2015-10-08 19:35:08 UTC; fdetsch
+Packaged: 2015-10-09 09:13:03 UTC; fdetsch
 Repository: CRAN
-Date/Publication: 2015-10-08 22:59:36
+Date/Publication: 2015-10-09 11:36:42
