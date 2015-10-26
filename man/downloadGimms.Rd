@@ -9,13 +9,13 @@
 \title{Download GIMMS 3G data}
 \usage{
 \S4method{downloadGimms}{numeric}(x, y, dsn = getwd(), overwrite = FALSE,
-  quiet = TRUE, ...)
+  quiet = TRUE, mode = "wb", ...)
 
 \S4method{downloadGimms}{character}(x, dsn = getwd(), overwrite = FALSE,
-  quiet = TRUE, ...)
+  quiet = TRUE, mode = "wb", ...)
 
 \S4method{downloadGimms}{missing}(dsn = getwd(), overwrite = FALSE,
-  quiet = TRUE, ...)
+  quiet = TRUE, mode = "wb", ...)
 }
 \arguments{
 \item{x}{If 'numeric', start year for download (e.g. 2000). If 'character',
@@ -35,7 +35,10 @@ will be overwritten.}
 \item{quiet}{Logical. If \code{TRUE}, information sent to the console is
 reduced.}
 
-\item{...}{Further arguments passed on to \code{\link{download.file}}.}
+\item{mode}{See \code{\link{download.file}}.}
+
+\item{...}{Further arguments passed on to \code{\link{download.file}}, e.g.
+'method'.}
 }
 \value{
 A vector of filepaths.
@@ -46,9 +49,11 @@ Download GIMMS 3G binary data for a given time span from NASA FTP server
 }
 \examples{
 \dontrun{
+## Destination folder for data download
+gimms_dir <- paste0(getwd(), "/data")
+
 ## Download GIMMS NDVI3g binary data from 2000-2005 (this might take some time...)
-gimms_files <- downloadGimms(x = 2000, y = 2005,
-                             dsn = paste0(getwd(), "/data"))
+gimms_files <- downloadGimms(x = 2000, y = 2005, dsn = gimms_dir)
 gimms_files[1:10]
 }
 }

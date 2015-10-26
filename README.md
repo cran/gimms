@@ -1,5 +1,27 @@
 
 
+#### Package downloads from the [RStudio CRAN Mirror](http://cran-logs.rstudio.com/)</b>
+
+This month      | In total
+--------------- | -----------
+![month](http://cranlogs.r-pkg.org/badges/gimms) | ![total](http://cranlogs.r-pkg.org/badges/grand-total/gimms)
+
+<hr>
+
+
+#### What's new?
+
+I recently received an invaluable bug report about some strange behavior of `downloadGimms` and a rather awkward look of the rasterized images resulting therefrom. 
+
+<center>
+  <img src="http://i.imgur.com/MySaI9F.png" alt="windows_bug" style="width: 650px;"/
+</center>
+
+The problem was obviously related to `download.file` which worked just fine under Linux when using the default settings but introduced distortions under Windows. In the newest package version which is currently on GitHub (install via `devtools::install_github("environmentalinformatics-marburg/gimms", ref = "develop")`) and (hopefully) soon on CRAN, I therefore specified `download.file(..., mode = "wb")` to explicitly enable binary writing mode. 
+
+Thanks again for the input! 
+
+
 # Introducing the R 'gimms' package
 
 ### What it is all about
@@ -21,8 +43,19 @@ far. Feel free to comment, raise issues and provide (constructive) criticism.
 Any suggestions on how to improve the **gimms** package are highly appreciated!
 
 ### How to install
-So far, the **gimms** package has not been submitted to CRAN but a preliminary 
-package version can be installed directly from 
+The **gimms** package is now officially on CRAN and can be install directly via 
+
+
+```r
+# ## install 'gimms' package
+# install.packages("gimms")
+
+## load 'gimms' package
+library(gimms)
+```
+
+If you wish to install the development version including latest bug-fixes etc. 
+instead (no liability assumed!), directly install the package from 
 [GitHub](https://github.com/environmentalinformatics-marburg/gimms) via 
 `install_github` from the **devtools** package (Wickham and Chang, 2015).
 
@@ -30,7 +63,7 @@ package version can be installed directly from
 ```r
 # ## install 'gimms' package
 # library(devtools)
-# install_github("environmentalinformatics-marburg/gimms")
+# install_github("environmentalinformatics-marburg/gimms", ref = "develop")
 
 ## load 'gimms' package
 library(gimms)
@@ -153,17 +186,21 @@ rearrangeFiles(dsn = paste0(getwd(), "/data"),
 
 
 ```
-##  [1] "geo13jul15a.n19-VI3g" "geo13jul15b.n19-VI3g" "geo13aug15a.n19-VI3g"
-##  [4] "geo13aug15b.n19-VI3g" "geo13sep15a.n19-VI3g" "geo13sep15b.n19-VI3g"
-##  [7] "geo13oct15a.n19-VI3g" "geo13oct15b.n19-VI3g" "geo13nov15a.n19-VI3g"
-## [10] "geo13nov15b.n19-VI3g" "geo13dec15a.n19-VI3g" "geo13dec15b.n19-VI3g"
+##  [1] "geo13jan15a.n19-VI3g" "geo13jan15b.n19-VI3g" "geo13feb15a.n19-VI3g"
+##  [4] "geo13feb15b.n19-VI3g" "geo13mar15a.n19-VI3g" "geo13mar15b.n19-VI3g"
+##  [7] "geo13apr15a.n19-VI3g" "geo13apr15b.n19-VI3g" "geo13may15a.n19-VI3g"
+## [10] "geo13may15b.n19-VI3g" "geo13jun15a.n19-VI3g" "geo13jun15b.n19-VI3g"
+## [13] "geo13jul15a.n19-VI3g" "geo13jul15b.n19-VI3g" "geo13aug15a.n19-VI3g"
+## [16] "geo13aug15b.n19-VI3g" "geo13sep15a.n19-VI3g" "geo13sep15b.n19-VI3g"
+## [19] "geo13oct15a.n19-VI3g" "geo13oct15b.n19-VI3g" "geo13nov15a.n19-VI3g"
+## [22] "geo13nov15b.n19-VI3g" "geo13dec15a.n19-VI3g" "geo13dec15b.n19-VI3g"
 ```
 
 ### Create a header file
 In order to import the GIMMS binary files into R via `raster::raster`, the 
 creation of header files (.hdr) that are located in the same folder as the 
 binary files staged for processing is mandatory. The standard files required to 
-properly process GIMMS NDVI3g data are created via `createHdr` and typically 
+properly process GIMMS NDVI3g data are created via `createHeader` and typically 
 include the following parameters. 
 
 
@@ -180,14 +217,14 @@ include the following parameters.
 ```
 
 It is possibly to automatically remove the created header files by setting 
-`rasterizeGimms(..., remove_hdr = TRUE)` once all operations have finished. 
-Although `rasterizeGimms` automatically invokes `createHdr`, the function also 
+`rasterizeGimms(..., remove_header = TRUE)` once all operations have finished. 
+Although `rasterizeGimms` automatically invokes `createHeader`, the function also 
 runs as stand-alone version.
 
 
 ```r
 ## create gimms ndvi3g standard header file
-gimms_header <- createHdr("~/geo13jul15a.n19-VI3g")
+gimms_header <- createHeader("~/geo13jul15a.n19-VI3g")
 
 gimms_header
 ```
@@ -255,6 +292,7 @@ spplot(gimms_raster,
 
 <center>
   <img src="http://i.imgur.com/Qr3FuNr.png" alt="spplot" style="width: 800px;"/>
+  <br><br><b>Figure 1.</b>Global bi-monthly GIMMS NDVI3g images from July to December 2013.
 </center>
 
 
@@ -283,32 +321,50 @@ gimms_raster_mvc <- monthlyComposite(gimms_files_tif)
 Again and this time with a little help from **reshape2** 
 (Wickham, 2007) and **ggplot2** (Wickham, 2009), 
 the effects from `monthlyComposite` can easily be seen. Displayed below are the 
-densityplots of all NDVI values during the 1st half of July 1981 (red), during 
-the 2nd half of July 1981 (green) and the resulting MVC values (blue).
+densityplots of all NDVI values during the 1st half of July 1981 (green), during 
+the 2nd half of July 1981 (turquoise) and the resulting MVC values (black).
 
 
 ```r
-## visualize difference between 1st and 2nd half of July 1981 and resulting MVC
+## concatenate data
 val <- data.frame("ndvi_15a" = na.omit(getValues(gimms_raster[[1]])), 
                   "ndvi_15b" = na.omit(getValues(gimms_raster[[2]])), 
                   "ndvi_mvc" = na.omit(getValues(gimms_raster_mvc[[1]])))
 
+## wide to long format
 library(reshape2)
 val_mlt <- melt(val)
 
+## colors
+devtools::install_github("environmentalinformatics-marburg/Rsenal")
+library(Rsenal)
+cols <- envinmrPalette(5)[c(3, 2, 5)]
+names(cols) <- levels(val_mlt$variable)
+
+## linetypes
+ltys <- c("solid", "solid", "longdash")
+names(ltys) <- levels(val_mlt$variable)
+
+## build ggplot
 library(ggplot2)
-ggplot(aes(x = value, group = variable, colour = variable), 
-       data = val_mlt) + 
-  geom_density(size = 1.2) + 
+ggplot(aes(x = value, group = variable, colour = variable, 
+           linetype = variable), data = val_mlt) + 
+  geom_hline(yintercept = 0, size = .5, colour = "grey65") +
+  geom_line(stat = "density", size = 1.2) + 
+  scale_colour_manual("dataset", values = cols) + 
+  scale_linetype_manual("dataset", values = ltys) + 
   labs(x = "\nNDVI", y = "Density\n") + 
-  theme_bw()
+  theme_bw() + 
+  theme(panel.grid = element_blank(), 
+        legend.key.width = grid::unit(1.8, "cm"))
 ```
 
 
 
 <center>
-  <img src="http://i.imgur.com/zrW1hRK.png" alt="ggplot" style="width: 600px;"/>
-</center>
+  <img src="http://i.imgur.com/WmTlFyV.png" alt="ggplot" style="width: 650px;"/>
+  <br><br><b>Figure 2.</b> Kernel density distribution of GIMMS NDVI3g values during the first (green) and second half of July 2013 (turquoise) and resulting value distribution of the maximum value composite layer (MVC; black). 
+</center> 
 
 ### Some considerations on code performance
 In order to speed things up a little bit, it is quite easy to add multi-core 
@@ -328,24 +384,30 @@ system.time(
 #  48.142   3.003  54.535
 
 ## next, the parallelized version
-rasterizeGimmsParallel <- function(files, nodes = 4, ...) {
+rasterizeGimmsParallel <- function(files, nodes = 4, overwrite = FALSE, ...) {
 
-  # create and register parallel backend
-  library(doParallel)
-  cl <- makeCluster(nodes)
-  registerDoParallel(cl)
-  
-  # loop over 'x' and process single files in parallel
-  ls_rst <- foreach(i = files, .packages = "gimms", 
-                    .export = ls(envir = globalenv())) %dopar% {
-                      rasterizeGimms(i, filename = paste0(i, ".tif"), ...)
+# create and register parallel backend
+library(doParallel)
+cl <- makeCluster(nodes)
+registerDoParallel(cl)
+
+# loop over 'x' and process single files in parallel
+ls_rst <- foreach(i = files, .packages = "gimms", 
+                  .export = ls(envir = globalenv())) %dopar% {
+                    filename <- paste0(i, ".tif")
+                    
+                    if (overwrite | !file.exists(filename)) {
+                      rasterizeGimms(i, filename = filename, overwrite = TRUE, ...)
+                    } else {
+                      raster(i, crs = "+init=epsg:4326")
                     }
-  
-  # deregister parallel backend
-  closeAllConnections()
-  
-  # return stacked layers
-  return(stack(ls_rst))
+                  }
+
+# deregister parallel backend
+closeAllConnections()
+
+# return stacked layers
+return(stack(ls_rst))
 }
 
 system.time(
@@ -358,7 +420,7 @@ system.time(
 In the context of parallel processing, feel free to also browse the advanced 
 applications based on GIMMS NDVI3g data below. There are some more examples 
 included demonstrating the reasonable use of **doParallel** functionality 
-(Analytics and Weston, 2014) along with the **gimms** package, which is 
+(Analytics and Weston, 2015) along with the **gimms** package, which is 
 probably particulary applicable for `downloadGimms` (given that your internet 
 connection is fast enough to manage multi-core file downloads).
 
@@ -367,15 +429,20 @@ connection is fast enough to manage multi-core file downloads).
 
 ### Advanced applications
 The last section of this brief introduction is meant to demonstrate the use of 
-GIMMS NDVI3g data in a more practical sense. Perhaps it might be interesting for 
+GIMMS NDVI3g data in a more practical sense. Note that all necessary work steps 
+are briefly documented as in-line comments. Perhaps it might be interesting for 
 some of you...
 
 ##### Global Mann-Kendall trend based on GIMMS NDVI3g
 
 ```r
+################################################################################
+## download data
+################################################################################
+
 ## download entire gimms ndvi3g collection in parallel
 library(doParallel)
-cl <- makeCluster(4)
+cl <- makeCluster(3)
 registerDoParallel(cl)
 
 gimms_files <- updateInventory(sort = TRUE)
@@ -384,7 +451,121 @@ gimms_files <- foreach(i = gimms_files, .packages = "gimms",
 
 stopImplicitCluster()
 
+################################################################################
+## rasterize binary files
+################################################################################
+
 ## rasterize gimms ndvi3g binary files in parallel (see above function 
 ## definition of `rasterizeGimmsParallel`)
-gimms_raster <- rasterizeGimmsParallel(gimms_files)
+gimms_raster <- rasterizeGimmsParallel(gimms_files, overwrite = TRUE)
+
+## remove incomplete first year
+gimms_files <- gimms_files[-(1:12)]
+gimms_raster <- gimms_raster[[-(1:12)]]
+
+################################################################################
+## resample to a lower spatial resolution (to avoid stack overflow)
+################################################################################
+
+## aggregate to a lower spatial resolution
+cl <- makeCluster(4)
+registerDoParallel(cl)
+
+gimms_raster_agg <- foreach(i = 1:nlayers(gimms_raster), 
+                            .packages = c("raster", "rgdal")) %dopar%
+  aggregate(gimms_raster[[i]], fact = 3, fun = median, 
+            filename = paste0("data/agg/AGG_", names(gimms_raster[[i]])), 
+            format = "GTiff", overwrite = TRUE)
+
+gimms_raster_agg <- stack(gimms_raster_agg)
+
+################################################################################
+## remove seasonal signal
+################################################################################
+
+## calculate long-term bi-monthly means
+gimms_list_means <- foreach(i = 1:24, 
+                            .packages = c("raster", "rgdal")) %dopar% {
+  
+  # layers corresponding to current period (e.g. '82jan15a')
+  id <- seq(i, nlayers(gimms_raster_agg), 24)
+  gimms_raster_agg_tmp <- gimms_raster_agg[[id]]
+  
+  # calculate long-term mean of current period (e.g. for 1982-2013 'jan15a')
+  calc(gimms_raster_agg_tmp, fun = mean, na.rm = TRUE)
+} 
+
+gimms_raster_means <- stack(gimms_list_means)
+
+## replicate bi-monthly 'gimms_raster_means' to match up with number of layers of 
+## initial 'gimms_raster_agg' (as `foreach` does not support recycling!)
+gimms_list_means <- replicate(nlayers(gimms_raster_agg) / nlayers(gimms_raster_means), 
+                              gimms_raster_means)
+gimms_raster_means <- stack(gimms_list_means)
+
+## subtract long-term mean from bi-monthly values
+files_out <- names(gimms_raster_agg)
+gimms_list_deseason <- foreach(i = 1:nlayers(gimms_raster_agg), 
+                               .packages = c("raster", "rgdal")) %dopar% {
+  
+  rst <- gimms_raster_agg[[i]] - gimms_raster_means[[i]]
+  rst <- writeRaster(rst, 
+                     filename = paste0("data/dsn/DSN_", names(gimms_raster_agg[[i]])), 
+                     format = "GTiff", overwrite = TRUE)
+  
+}
+
+gimms_raster_deseason <- stack(gimms_list_deseason)
+
+################################################################################
+## mann-kendall trend test (p < 0.001)
+################################################################################
+
+## custom function that returns significant values of tau only
+library(Kendall)
+
+significantTau <- function(x) {
+  mk <- MannKendall(x)
+  # reject value of tau if p >= 0.001
+  if (mk$sl >= 0.001) {
+    return(NA) 
+  # keep value of tau if p < 0.001
+  } else {
+    return(mk$tau)
+  }
+}
+
+## apply custom function on a pixel basis
+gimms_raster_trend <- overlay(gimms_raster_deseason, fun = significantTau, 
+                              filename = "data/out/gimms_mk001_8213", 
+                              format = "GTiff", overwrite = TRUE)
+
+################################################################################
+## visualize data
+################################################################################
+
+## complementary shapefile data
+library(rworldmap)
+data("countriesCoarse")
+
+## colors, see http://colorbrewer2.org/
+library(RColorBrewer)
+cols <- colorRampPalette(brewer.pal(11, "BrBG"))
+
+## create plot
+spplot(gimms_raster_trend, col.regions = cols(100), scales = list(draw = TRUE), 
+       sp.layout = list("sp.polygons", countriesCoarse, col = "grey65"), 
+       at = seq(-.6, .6, .1))
 ```
+
+
+
+<center>
+  <img src="http://i.imgur.com/M6sUz6z.png" alt="spplot" style="width: 800px;"/><br><br>
+  <b>Figure 3.</b> Long-term trend (1982-2013; <i>p<0.01</i>) in global GIMMS NDVI3g derived from pixel-based Mann-Kendall trend tests (Mann, 1945).
+</center>
+
+
+
+##### Global vegetation response to the 1997/98 El Niño
+

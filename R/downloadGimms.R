@@ -20,7 +20,9 @@ if ( !isGeneric("downloadGimms") ) {
 #' will be overwritten.
 #' @param quiet Logical. If \code{TRUE}, information sent to the console is
 #' reduced.
-#' @param ... Further arguments passed on to \code{\link{download.file}}.
+#' @param mode See \code{\link{download.file}}.
+#' @param ... Further arguments passed on to \code{\link{download.file}}, e.g.
+#' 'method'.
 #'
 #' @return
 #' A vector of filepaths.
@@ -33,9 +35,11 @@ if ( !isGeneric("downloadGimms") ) {
 #'
 #' @examples
 #' \dontrun{
+#' ## Destination folder for data download
+#' gimms_dir <- paste0(getwd(), "/data")
+#'
 #' ## Download GIMMS NDVI3g binary data from 2000-2005 (this might take some time...)
-#' gimms_files <- downloadGimms(x = 2000, y = 2005,
-#'                              dsn = paste0(getwd(), "/data"))
+#' gimms_files <- downloadGimms(x = 2000, y = 2005, dsn = gimms_dir)
 #' gimms_files[1:10]
 #' }
 #' @export downloadGimms
@@ -49,11 +53,12 @@ setMethod("downloadGimms",
           signature(x = "numeric"),
           function(x, y,
                    dsn = getwd(), overwrite = FALSE, quiet = TRUE,
-                   ...) {
+                   mode = "wb", ...) {
 
   ## jump to downloadGimms,missing-method if neither 'x' nor 'y' is specified
   if (missing(x) & missing(y))
-    downloadGimms(dsn = dsn, overwrite = overwrite, quiet = quiet, ...)
+    downloadGimms(dsn = dsn, overwrite = overwrite, quiet = quiet,
+                  mode = mode, ...)
 
   ## available files
   gimms_fls <- updateInventory(sort = TRUE)
@@ -84,7 +89,8 @@ setMethod("downloadGimms",
       if (!quiet)
         cat("File", destfile, "already exists in destination folder. Proceeding to next file ...\n")
     } else {
-      try(download.file(i, destfile = destfile, ...), silent = TRUE)
+      try(download.file(i, destfile = destfile, mode = mode,
+                        quiet = quiet, ...), silent = TRUE)
     }
   }
 
@@ -101,7 +107,8 @@ setMethod("downloadGimms",
 #' @rdname downloadGimms
 setMethod("downloadGimms",
           signature(x = "character"),
-          function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE, ...) {
+          function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE,
+                   mode = "wb", ...) {
 
   ## download
   for (i in x) {
@@ -109,7 +116,8 @@ setMethod("downloadGimms",
     if (file.exists(destfile) & !overwrite) {
       cat("File", destfile, "already exists in destination folder. Proceeding to next file ...\n")
     } else {
-      try(download.file(i, destfile = destfile, ...), silent = TRUE)
+      try(download.file(i, destfile = destfile, mode = mode,
+                        quiet = quiet, ...), silent = TRUE)
     }
   }
 
@@ -126,7 +134,8 @@ setMethod("downloadGimms",
 #' @rdname downloadGimms
 setMethod("downloadGimms",
           signature(x = "missing"),
-          function(dsn = getwd(), overwrite = FALSE, quiet = TRUE, ...) {
+          function(dsn = getwd(), overwrite = FALSE, quiet = TRUE,
+                   mode = "wb", ...) {
 
   ## available files
   gimms_fls <- updateInventory()
@@ -137,7 +146,8 @@ setMethod("downloadGimms",
     if (file.exists(destfile) & !overwrite) {
       cat("File", destfile, "already exists in destination folder. Proceeding to next file ...\n")
     } else {
-      try(download.file(i, destfile = destfile, ...), silent = TRUE)
+      try(download.file(i, destfile = destfile, mode = mode,
+                        quiet = quiet, ...), silent = TRUE)
     }
   }
 
