@@ -17,7 +17,7 @@ if ( !isGeneric("significantTau") ) {
 #' to the Mann-Kendall trend test.
 #' @param df 'logical'. If \code{TRUE}, a 'data.frame' holding the value of
 #' Kendall's tau and the referring significance level.
-#' @param filename 'character'. Optional output filename, see
+#' @param filename 'character'. Optional output filename; see
 #' \code{\link{writeRaster}}. Needs to include an appropriate file format
 #' extension, see \code{\link{writeFormats}}.
 #' @param ... Further arguments passed on to \code{\link{zyp.trend.vector}}.
@@ -171,17 +171,16 @@ setMethod("significantTau",
 
 
 ################################################################################
-### function using 'RasterStack' input #########################################
-#' @aliases significantTau,RasterStack-method
+### function using 'RasterStack' or 'RasterBrick' input ########################
+#' @aliases significantTau,RasterStackBrick-method
 #' @rdname significantTau
 setMethod("significantTau",
           signature(x = "RasterStackBrick"),
-          function(x, p = 0.001, prewhitening = TRUE, df = FALSE,
-                   filename = "", ...) {
+          function(x, p = 0.001, prewhitening = TRUE, filename = "", ...) {
 
             rst_mk <- raster::overlay(x, fun = function(y, ...) {
               significantTau(y, p = p,
-                             prewhitening = prewhitening, df = df, ...)
+                             prewhitening = prewhitening, df = FALSE, ...)
             })
 
             ## write to file

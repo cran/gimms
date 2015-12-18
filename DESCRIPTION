@@ -1,9 +1,10 @@
 Package: gimms
 Type: Package
 Title: Download and Process GIMMS NDVI3g Data
-Version: 0.3.0
-Date: 2015-11-12
-Author: Florian Detsch
+Version: 0.4.0
+Date: 2015-12-16
+Authors@R: 
+    person("Florian", "Detsch", email = "admin@environmentalinformatics-marburg.de", role = c("cre", "aut"))
 Maintainer: Florian Detsch <admin@environmentalinformatics-marburg.de>
 Description: We provide a set of functions to retrieve information about GIMMS
     NDVI3g files currently available online; download and re-arrange the bi-monthly
@@ -14,11 +15,12 @@ Description: We provide a set of functions to retrieve information about GIMMS
     Mann-Kendall trend test, optionally featuring pre-whitening to
     account for lag-1 autocorrelation.
 Depends: raster, methods
-Imports: Kendall, zyp
+Imports: parallel, doParallel, foreach, Kendall, zyp
 License: GPL (>= 3) | file LICENSE
 LazyData: TRUE
 RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2015-11-13 14:32:09 UTC; fdetsch
+Packaged: 2015-12-17 12:50:56 UTC; fdetsch
+Author: Florian Detsch [cre, aut]
 Repository: CRAN
-Date/Publication: 2015-11-14 00:05:49
+Date/Publication: 2015-12-18 11:00:36

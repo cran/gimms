@@ -3,14 +3,15 @@
 \docType{methods}
 \name{monthlyComposite}
 \alias{monthlyComposite}
-\alias{monthlyComposite,RasterStack-method}
+\alias{monthlyComposite,RasterStackBrick-method}
 \alias{monthlyComposite,character-method}
 \title{Calculate monthly composite images}
 \usage{
-\S4method{monthlyComposite}{RasterStack}(x, indices, fun = max, ...)
+\S4method{monthlyComposite}{RasterStackBrick}(x, indices, fun = max,
+  cores = 1L, filename = "", ...)
 
 \S4method{monthlyComposite}{character}(x, pos1 = 4L, pos2 = 8L, fun = max,
-  ...)
+  cores = 1L, filename = "", ...)
 }
 \arguments{
 \item{x}{RasterStack (requires 'indices') or character vector of filenames.
@@ -23,7 +24,13 @@ previously been created via \code{\link{rasterizeGimms}}.}
 identical months; see \code{\link{stackApply}}.}
 
 \item{fun}{Function. Used to calculate monthly composite layers, defaults to
-\code{sum}, i.e. MVC; see \code{\link{stackApply}}.}
+\code{max}; see \code{\link{stackApply}}.}
+
+\item{cores}{Integer. Number of cores for parallel computing.}
+
+\item{filename}{Character. Optional output filename(s); see
+\code{\link{writeRaster}}. If \code{cores > 1}, the number of supplied
+filenames must match up with the number of unique monthly indices.}
 
 \item{...}{Further arguments passed on to \code{\link{writeRaster}}.}
 
@@ -41,20 +48,23 @@ composites (MVC), aggregate bi-monthly GIMMS datasets to monthly composites.
 }
 \examples{
 \dontrun{
-## Destination folder for data download
+## Download sample data
 gimms_dir <- paste0(getwd(), "/data")
 
-## Download GIMMS NDVI3g binary data from 2000-2005
-gimms_files <- downloadGimms(x = 2000, y = 2005, dsn = gimms_dir)
+gimms_files <- downloadGimms(x = as.Date("2000-01-01"),
+                             y = as.Date("2000-12-31"), dsn = gimms_dir)
 
-## Rasterize downloaded GIMMS files from 2000
-gimms_raster <- rasterizeGimms(x = gimms_files[1:24], remove_header = TRUE)
+## Rasterize files
+gimms_raster <- rasterizeGimms(x = gimms_files, remove_header = TRUE)
 
-## Calculate monthly maximum value composites
-indices <- monthlyIndices(gimms_files[1:24])
+## Create monthly maximum value composites
+indices <- monthlyIndices(gimms_files)
 gimms_raster_mvc <- monthlyComposite(gimms_raster, indices = indices)
 
-plot(gimms_raster_mvc[[1:4]])
+## Visualize data
+library(sp)
+names(gimms_raster_mvc) <- paste(month.abb, 2000)
+spplot(gimms_raster_mvc)
 }
 
 }
