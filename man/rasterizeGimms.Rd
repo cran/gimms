@@ -4,29 +4,33 @@
 \alias{rasterizeGimms}
 \title{Rasterize GIMMS NDVI3g binary data}
 \usage{
-rasterizeGimms(x, header = NULL, water2na = TRUE, nodata2na = TRUE,
-  scaling = TRUE, remove_header = FALSE, cores = 1L, filename = "", ...)
+rasterizeGimms(x, flag = FALSE, header = NULL, water2na = TRUE,
+  nodata2na = TRUE, scaling = TRUE, remove_header = FALSE, cores = 1L,
+  filename = "", ...)
 }
 \arguments{
 \item{x}{Character. Vector of local filepaths.}
 
-\item{header}{Character. Companion header files corresponding to the binary data
+\item{flag}{Logical. If \code{TRUE}, returns flag values instead of NDVI. See
+'References' for further reading. Note that this will be ignored if
+\code{scaling = FALSE}.}
+
+\item{header}{Character. Header file(s) corresponding to the binary data
 in 'x'. If missing, the standard header file for GIMMS NDVI3g binary data
 will be used.}
 
-\item{water2na}{Logical. If \code{TRUE} (default), pixels with 'mask-water'
-value (-10000) will be discarded. See also
-\url{http://ecocast.arc.nasa.gov/data/pub/gimms/3g.v0/00READMEgeo.txt}.}
+\item{water2na}{Logical. Determines whether or not to discard pixels with
+'mask-water' value (-10000; see 'References').}
 
-\item{nodata2na}{Logical. If \code{TRUE} (default), pixels with 'mask-nodata'
-value (-5000) will be discarded.}
+\item{nodata2na}{Logical. Determines whether or not to discard pixels with
+'mask-nodata' value (-5000; see 'References').}
 
-\item{scaling}{Logical. If \code{TRUE} (default), initial values will be
-scaled by a factor of 1/10000.}
+\item{scaling}{Logical. If \code{TRUE} (default), scaling is enabled which
+allows to retrieve NDVI or flag values (depending on 'flag').}
 
-\item{remove_header}{Logical. If \code{FALSE} (default), the header file
-specified in 'header' or, if not specified, created internally via
-\code{gimms:::createHeader} will be removed after all operations have finished.}
+\item{remove_header}{Logical. If \code{TRUE}, the header file specified in
+'header' or, if not specified, created internally via
+\code{gimms:::createHeader} is removed after all operations have finished.}
 
 \item{cores}{Integer. Number of cores for parallel computing. If 'filename'
 is not specified, the parallel option is automatically disabled.}
@@ -62,6 +66,12 @@ plot(gimms_raster)
 }
 \author{
 Florian Detsch
+}
+\references{
+\url{https://nex.nasa.gov/nex/projects/1349/wiki/general_data_description_and_access/}
+(accessed on January 15, 2016).
+\url{http://ecocast.arc.nasa.gov/data/pub/gimms/3g.v0/00READMEgeo.txt}
+(accessed on January 15, 2016).
 }
 \seealso{
 \code{gimms:::createHeader}, \code{\link{raster}}, \code{\link{writeRaster}}.
