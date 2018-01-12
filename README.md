@@ -1,5 +1,3 @@
-
-
 #### Package downloads from the [RStudio CRAN Mirror](http://cran-logs.rstudio.com/)</b>
 
 This month      | In total
@@ -10,11 +8,39 @@ This month      | In total
 
 #### Introducing the 'gimms' package
 
-... is an open-access tutorial about the **gimms** package which is now available from [GitBook](https://www.gitbook.com/book/envin-marburg/introducing-the-r-gimms-package/details). The book will be continuously updated as **gimms** develops further, so make sure to check it out regularly!
+... is an [open-access tutorial](https://www.gitbook.com/book/envin-marburg/introducing-the-r-gimms-package/details) about the **gimms** package which has been developed using [GitBook](https://www.gitbook.com/). The book will regularly be updated as **gimms** develops further, so make sure to check it out every now and then!
 
 <hr>
 
 #### What's new?
+
+##### 2017-01-02, "traditional" NDVI3g.v0 names from new NDVI3g.v1 files via `oldNaming`
+For all users who prefer to work with the now outdated NDVI3g.v0 file names, I've added a function called `oldNaming` to the 'develop' branch. It takes a vector of .nc4 file names as input and transforms them to traditional half-monthly file names, optionally appending a suffix *e.g.* in preparation for `writeRaster`. As this is not on CRAN yet, remember to install the 'develop' version via 
+```r
+devtools::install_github("environmentalinformatics-marburg/gimms", 
+                         ref = "develop")
+```
+to be able to use that function in the first place.
+
+<hr>
+
+##### 2016-12-17, **gimms** 1.0.0 is now on CRAN
+I am happy to announce that the brand-new package update (v1.0.0) has successfully been built for all platforms and is now available from [CRAN](https://cran.r-project.org/package=gimms). Among the major improvements are:
+
+* comprehensive support for the recently released GIMMS NDVI3g.v1 which comes as half-yearly NetCDF container files and spans the period until December 2015. For reasons of convenience, continuing support for NDVI3g.v0 ENVI binary files is maintained. 
+* quality control is now directly available through `rasterizeGimms`. In order to make sure older scripts are still operable, separate calls to `qualityControl` are possible, but explicitly require the specification of a 2-layered `RasterStackBrick` object (NDVI and flags).
+* `rasterizeGimms` further takes an optional argument 'ext' which is passed to `raster::crop` which, if used, drastically reduces computation times. At the same time, the application of a scale factor and the rejection of 'mask-water' and 'mask-nodata' values is no longer optional.
+* parallel processing is no longer realized through **foreach** (alongside with **doParallel**), but instead relies on the built-in **parallel** package only. Therefore, the former two are no longer part of the package Imports section.
+* et cetera
+
+##### 2016-01-15, **gimms** 0.5.0 is now on CRAN
+As of today, **gimms** 0.5.0 is available from [CRAN](https://cran.r-project.org/package=gimms) and has some new functionality:
+
+* enabled flag support in `rasterizeGimms`. In addition to the raw and scaled values of NDVI3g, the function now optionally returns flag layers which can subsequently be used for quality control. Please refer to the official [README](ecocast.arc.nasa.gov/data/pub/gimms/3g.v0/00READMEgeo.txt) for further reading. 
+* improved performance of parallel processing.
+* revised package documentation.
+
+<hr>
 
 ##### 2015-12-16, added parallel support
 I decided to add optional multi-core support to `downloadGimms`, `rasterizeGimms` and `monthlyComposite`. The referring arument is called 'cores' and, if not specified otherwise, defaults to 1 (i.e., parallel computing is disabled). In the course of this, the **gimms** package version on branch 'develop' has been incremented to 0.4.0 and can be installed via `devtools::install_github` (see further below).
