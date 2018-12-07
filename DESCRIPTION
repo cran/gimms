@@ -1,8 +1,8 @@
 Package: gimms
 Type: Package
 Title: Download and Process GIMMS NDVI3g Data
-Version: 1.1.0
-Date: 2018-01-12
+Version: 1.1.1
+Date: 2018-12-07
 URL: https://github.com/environmentalinformatics-marburg/gimms
 BugReports: https://github.com/environmentalinformatics-marburg/gimms/issues
 Authors@R: person("Florian", "Detsch", email = "fdetsch@web.de", role = c("cre", "aut"))
@@ -21,9 +21,10 @@ Depends: R (>= 2.10), raster, methods
 Imports: curl, parallel, Kendall, ncdf4, RCurl, zyp
 License: MIT + file LICENSE
 LazyData: TRUE
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
+Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2018-01-12 12:36:58 UTC; fdetsch
+Packaged: 2018-12-07 09:58:38 UTC; FlorianD
 Author: Florian Detsch [cre, aut]
 Repository: CRAN
-Date/Publication: 2018-01-13 00:30:00 UTC
+Date/Publication: 2018-12-07 11:20:03 UTC
