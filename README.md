@@ -1,8 +1,16 @@
-#### Package downloads from the [RStudio CRAN Mirror](http://cran-logs.rstudio.com/)</b>
+#### Package downloads and build status</b>
+
+##### Downloads from the [RStudio CRAN Mirror](http://cran-logs.rstudio.com/)
 
 This month      | In total
 --------------- | -----------
 ![month](http://cranlogs.r-pkg.org/badges/gimms) | ![total](http://cranlogs.r-pkg.org/badges/grand-total/gimms)
+
+##### Build status
+
+CRAN | Travis-CI (master) | Travis-CI (devel)
+---- | ------------------ | -----------------
+[![](http://www.r-pkg.org/badges/version/gimms)](http://www.r-pkg.org/pkg/gimms) | [![](https://travis-ci.org/environmentalinformatics-marburg/gimms.svg?branch=master)](https://travis-ci.org/environmentalinformatics-marburg/gimms) | [![](https://travis-ci.org/environmentalinformatics-marburg/gimms.svg?branch=develop)](https://travis-ci.org/environmentalinformatics-marburg/gimms)
 
 <hr>
 
@@ -13,6 +21,12 @@ This month      | In total
 <hr>
 
 #### What's new?
+
+##### 2018-12-07, **gimms** 1.1.1 is out now
+
+Starting with this update, rasterized NDVI3g.v0 images are no longer kept in memory, but properly linked to their corresponding files on disk (only applicable if 'filename' is specified in `rasterizeGimms()`).
+
+<hr>
 
 ##### 2018-01-13, **gimms** 1.1.0 is now on CRAN
 
@@ -39,10 +53,12 @@ I am happy to announce that the brand-new package update (v1.0.0) has successful
 * parallel processing is no longer realized through **foreach** (alongside with **doParallel**), but instead relies on the built-in **parallel** package only. Therefore, the former two are no longer part of the package Imports section.
 * et cetera
 
+<hr>
+
 ##### 2016-01-15, **gimms** 0.5.0 is now on CRAN
 As of today, **gimms** 0.5.0 is available from [CRAN](https://cran.r-project.org/package=gimms) and has some new functionality:
 
-* enabled flag support in `rasterizeGimms`. In addition to the raw and scaled values of NDVI3g, the function now optionally returns flag layers which can subsequently be used for quality control. Please refer to the official [README](ecocast.arc.nasa.gov/data/pub/gimms/3g.v0/00READMEgeo.txt) for further reading. 
+* enabled flag support in `rasterizeGimms`. In addition to the raw and scaled values of NDVI3g, the function now optionally returns flag layers which can subsequently be used for quality control. Please refer to the official [README](http://nasanex.s3.amazonaws.com/AVHRR/GIMMS/3G/00READMEgeo.txt) for further reading. 
 * improved performance of parallel processing.
 * revised package documentation.
 
