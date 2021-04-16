@@ -2,11 +2,18 @@
 
 downloader <- function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE,
                        mode = "wb", cores = 1L, ...) {
-
-  ### single core
-
+  
+  ## check if target folder exists
+  checkDsn(dsn)
+  
+  ## check 'cores'
+  cores <- checkCores(cores)
+  
+  
+  ### . single core ----
+  
   if (cores == 1L) {
-
+    
     ## download files one after another
     for (i in x) {
       destfile <- paste0(dsn, "/", basename(i))
@@ -14,24 +21,41 @@ downloader <- function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE,
         if (!quiet)
           cat("File", destfile, "already exists in destination folder. Proceeding to next file ...\n")
       } else {
-        try(download.file(i, destfile = destfile, mode = mode,
-                          quiet = quiet, ...), silent = TRUE)
+        if (grepl("^ftp://", i)) {
+          h = curl::new_handle(
+            userpwd = "download_403193:72855006"
+          )
+          try(
+            curl::curl_download(
+              i
+              , destfile = destfile
+              , handle = h
+            )
+            , silent = TRUE
+          )
+        } else {
+          try(download.file(i, destfile = destfile, mode = mode,
+                            quiet = quiet, ...), silent = TRUE)
+        }
       }
     }
-
-
-    ### multi-core
-
+    
+    
+    ### . multi-core ----
+    
   } else {
-
+    
     ## initialize cluster
     cl <- parallel::makePSOCKcluster(cores)
     on.exit(parallel::stopCluster(cl))
-
+    
     ## export required variables
-    parallel::clusterExport(cl, c("x", "cores", "dsn", "overwrite", "quiet",
-                                  "mode"), envir = environment())
-
+    parallel::clusterExport(
+      cl
+      , c("x", "dsn", "overwrite", "quiet", "mode")
+      , envir = environment()
+    )
+    
     ## download files in parallel
     parallel::parLapply(cl, x, function(i) {
       destfile <- paste0(dsn, "/", basename(i))
@@ -39,12 +63,26 @@ downloader <- function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE,
         if (!quiet)
           cat("File", destfile, "already exists in destination folder. Proceeding to next file ...\n")
       } else {
-        try(download.file(i, destfile = destfile, mode = mode,
-                          quiet = quiet, ...), silent = TRUE)
+        if (grepl("^ftp://", i)) {
+          h = curl::new_handle(
+            userpwd = "download_403193:72855006"
+          )
+          try(
+            curl::curl_download(
+              i
+              , destfile = destfile
+              , handle = h
+            )
+            , silent = TRUE
+          )
+        } else {
+          try(download.file(i, destfile = destfile, mode = mode,
+                            quiet = quiet, ...), silent = TRUE)
+        }
       }
     })
   }
-
+  
   ## return downloaded files
   gimms_out <- paste(dsn, basename(x), sep = "/")
   return(gimms_out)
@@ -54,7 +92,7 @@ downloader <- function(x, dsn = getwd(), overwrite = FALSE, quiet = TRUE,
 ### create gimms-specific envi header file -------------------------------------
 
 createHeader <- function(x) {
-
+  
   ## default content of gimms ndvi3g-related header file
   header <- paste("ENVI",
                   "description = { R-language data }",
@@ -66,7 +104,7 @@ createHeader <- function(x) {
                   "interleave = bsq",
                   "sensor type = AVHRR",
                   "byte order = 1", sep = "\n")
-
+  
   ## write .hdr for each input file to disk
   sapply(x, function(i) {
     fls <- paste0(i, ".hdr")
@@ -79,16 +117,16 @@ createHeader <- function(x) {
 ### check desired number of cores ----------------------------------------------
 
 checkCores <- function(cores) {
-
+  
   ## available cores
   cores_avl <- parallel::detectCores()
-
+  
   ## resize if 'cores' exceeds number of available cores
   if (cores > cores_avl) {
     cores <- cores_avl - 1
     warning("Desired number of cores is invalid. Resizing parallel cluster to ", cores, " cores.")
   }
-
+  
   return(cores)
 }
 
@@ -96,19 +134,19 @@ checkCores <- function(cores) {
 ### check existence of target folder -------------------------------------------
 
 checkDsn <- function(dsn) {
-
+  
   ## if 'dsn' doesn't exist, ask user if it should be created
   if (!dir.exists(dsn)) {
     answer <- readline(paste("Target folder", dsn, "doesn't exist.",
                              "Do you wish to create it? (yes/no) \n"))
-
+    
     if (answer == "yes") {
       dir.create(dsn)
     } else {
       stop(paste("Target folder", dsn, "doesn't exist. Aborting operation...\n"))
     }
   }
-
+  
   return(invisible())
 }
 
@@ -116,7 +154,7 @@ checkDsn <- function(dsn) {
 ### (re-)set system locale -----
 
 setLocale <- function(reset = FALSE, ...) {
-
+  
   ## switch current locale to us standard
   if (!reset) {
     if (Sys.info()[["sysname"]] == "Windows") {
@@ -124,12 +162,12 @@ setLocale <- function(reset = FALSE, ...) {
     } else {
       invisible(Sys.setlocale(category = "LC_TIME", locale = "en_US.UTF-8"))
     }
-
+    
     ## reset locale
   } else {
     Sys.setlocale(category = "LC_TIME", ...)
   }
-
+  
   return(invisible())
 }
 
@@ -138,32 +176,32 @@ setLocale <- function(reset = FALSE, ...) {
 
 ## from ndvi3g.v1 files
 getV1dates <- function(x, pos1 = 15L, pos2 = 23L, suffix = TRUE) {
-
+  
   fls <- substr(basename(x), pos1, pos2)
-
+  
   lst <- strsplit(fls, "_")
   yrs <- sapply(lst, "[[", 1)
   yrs <- substr(yrs, 3, 4)
   mts <- sapply(lst, "[[", 2)
-
+  
   # back-up current locale and subsequently swith to us standard
   locale <- Sys.getlocale(category = "LC_TIME")
   setLocale()
-
+  
   lst <- lapply(seq(mts), function(i) {
     mts <- if (mts[i] == "0106") {
       rep(tolower(month.abb[1:6]), each = 2)
     } else {
       rep(tolower(month.abb[7:12]), each = 2)
     }
-
+    
     if (suffix)
       mts <- paste0(mts, rep(c("15a", "15b"), length(mts) / 2))
-
+    
     dts <- paste0(yrs[i], mts)
     return(dts)
   })
-
+  
   # revoke locale time adjustment and return date strings
   setLocale(reset = TRUE, locale = locale)
   return(unlist(lst))
@@ -178,17 +216,17 @@ getV0dates <- function(x, pos1 = 4L, pos2 = 11L, suffix = TRUE) {
 ### extract product version -----
 
 productVersion <- function(x, uniform = FALSE) {
-
+  
   v0 <- substr(basename(x), 1, 3) == "geo"
   v1 <- substr(basename(x), 1, 6) == "ndvi3g"
-
+  
   ## if substrings do not match any naming convention, return NA;
   ## else return corresponding product version
   ids <- apply(cbind(v0, v1), 1, FUN = function(y) {
     tmp <- which(y)
     if (length(tmp) == 0) NA else tmp - 1
   })
-
+  
   ## optionally stop if different or non-classifiable product versions are found
   if (uniform) {
     if (length(unique(ids)) > 1)
@@ -196,7 +234,7 @@ productVersion <- function(x, uniform = FALSE) {
        sure to supply files from the same NDVI3g version only that follow the
        rules of GIMMS standard naming.\n")
   }
-
+  
   return(ids)
 }
 
@@ -204,20 +242,49 @@ productVersion <- function(x, uniform = FALSE) {
 ### check filenames -----
 
 checkFls <- function(x, filename) {
-
+  
   len <- length(filename)
-
+  
   if (len == 1) {
     if (nchar(filename) == 0) {
       rep(filename, length(x))
     } else {
       stop("If specified, 'filename' must be of the same length as 'x'.\n")
     }
-
+    
   } else if ((len > 1) & (len != length(x))) {
     stop("If specified, 'filename' must be of the same length as 'x'.\n")
-
+    
   } else {
     filename
   }
+}
+
+
+### . check version ----
+
+checkVersion = function(server, version) {
+  input = version
+  version = suppressWarnings(
+    as.integer(version)
+  )
+  
+  version = switch(
+    server
+    , "ecocast" = intersect(version, c(0, 1))
+    , "nasanex" = intersect(version, 0)
+    , "poles"   = intersect(version, 1)
+  )
+  
+  if (length(version) == 0) {
+    stop(
+      sprintf(
+        "NDVI3g version '%s' is not available from server '%s'."
+        , input
+        , server
+      )
+    )
+  }
+  
+  return(version)
 }
